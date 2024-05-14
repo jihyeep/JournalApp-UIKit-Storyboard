@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 
 class JournalEntry: NSObject, MKAnnotation {
-    // MKAnnotation 프로토콜을 추가함으로써 위치정보 및 데이터를 지도 상에 표시
+    // MKAnnotation 프로토콜을 추가함으로써 '국제 표준'으로 위치정보 및 데이터를 지도 상에 표시
     
     // MARK: - Properties
     let date: Date
@@ -36,6 +36,7 @@ class JournalEntry: NSObject, MKAnnotation {
         self.longitude = longitude
     }
     
+    // MKAnnotation 필수 프로퍼티
     var coordinate: CLLocationCoordinate2D {
         guard let lat = latitude,
               let long = longitude else {
@@ -44,6 +45,7 @@ class JournalEntry: NSObject, MKAnnotation {
         return CLLocationCoordinate2D(latitude: lat, longitude: long)
     }
     
+    // 콜아웃에 출력되게 함
     var title: String? {
         date.formatted(.dateTime.year().month().day())
     }

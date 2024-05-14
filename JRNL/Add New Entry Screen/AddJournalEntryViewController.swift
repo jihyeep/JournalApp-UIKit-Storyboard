@@ -82,6 +82,7 @@ class AddJournalEntryViewController: UIViewController, UITextFieldDelegate, UITe
     }
     
     // MARK: - CLLocationManagerDelegate
+    // 성공
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let myCurrentLocation = locations.first {
             currentLocation = myCurrentLocation
@@ -89,7 +90,7 @@ class AddJournalEntryViewController: UIViewController, UITextFieldDelegate, UITe
             updateSaveButtonState()
         }
     }
-    
+    // 실패
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         print("Failed to find user's location: \(error.localizedDescription)")
     }

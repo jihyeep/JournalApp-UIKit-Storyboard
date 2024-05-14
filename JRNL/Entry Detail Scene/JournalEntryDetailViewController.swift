@@ -31,7 +31,9 @@ class JournalEntryDetailViewController: UITableViewController {
     }
     
     // MARK: - Private Methods
+    // 지도 스냅샷을 받았을 때 실행
     private func getMapSnapshot() {
+        // 위치 정보가 있다면
         if let lat = selectedJournalEntry?.latitude,
            let long = selectedJournalEntry?.longitude {
             let options = MKMapSnapshotter.Options()
@@ -47,6 +49,7 @@ class JournalEntryDetailViewController: UITableViewController {
                 }
             }
         } else {
+            // 위치 정보가 없다면
             self.mapImageView.image = UIImage(systemName: "map")
         }
     }
