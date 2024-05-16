@@ -13,7 +13,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     @IBOutlet var mapView: MKMapView!
     let locationManager = CLLocationManager() // 위치 정보 가져옴
-    var sampleJournalEntryData = SampleJournalEntryData() // 샘플 데이터
+//    var sampleJournalEntryData = SampleJournalEntryData() // 샘플 데이터
     var selectedJournalEntry: JournalEntry?
     
     override func viewDidLoad() {
@@ -22,12 +22,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         // 지도의 중심에 장치의 위치를 띄움
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer // 킬로미터로 정보 지정
         self.navigationItem.title = "Loading..."
-        locationManager.requestLocation()
+//        locationManager.requestLocation() // viewIsAppearing 함수로 이동(호출 시점 이동)
         
         mapView.delegate = self // 델리게이트 지정
-        sampleJournalEntryData.createSampleJournalEntryData()
-        mapView.addAnnotations(sampleJournalEntryData.journalEntries) // 핀이 박힘
+//        sampleJournalEntryData.createSampleJournalEntryData()
+//        mapView.addAnnotations(sampleJournalEntryData.journalEntries) // 핀이 박힘
+        
+    }
+    
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
+        locationManager.requestLocation()
     }
     
     // MARK: - CLLocationManagerDelegate
@@ -38,6 +45,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             let long = myLocation.coordinate.longitude
             self.navigationItem.title = "Map"
             mapView.region = setInitialRegion(lat: lat, long: long)
+            mapView.addAnnotations(SharedData.shared.getAllJournalEntries())
         }
     }
     // 실패

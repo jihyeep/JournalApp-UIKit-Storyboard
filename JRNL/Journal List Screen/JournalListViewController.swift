@@ -12,28 +12,34 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     // MARK: - Properties
     // IB와 연결된 오브젝트(객체)
     @IBOutlet var tableView: UITableView!
-    var sampleJournalEntryData = SampleJournalEntryData()
+//    var sampleJournalEntryData = SampleJournalEntryData()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         // 샘플 데이터 생성
-        sampleJournalEntryData.createSampleJournalEntryData()
+//        sampleJournalEntryData.createSampleJournalEntryData()
         
     }
     
     // MARK: - UITableViewDataSource
     // 특정 섹션에 대한 테이블 뷰의 행 수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        sampleJournalEntryData.journalEntries.count
+//        sampleJournalEntryData.journalEntries.count
+        SharedData.shared.numberOfJournalEntries()
     }
     
     // 특정 위치에 대한 테이블 뷰 셀 구성 및 반환
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let journalCell = tableView.dequeueReusableCell(withIdentifier: "journalCell", for: indexPath) as! JournalListTableViewCell
-        let journalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
-        journalCell.photoImageView.image = journalEntry.photo
-        journalCell.dateLabel.text = journalEntry.date.formatted(.dateTime.month().day().year())
+//        let journalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
+        let journalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
+//        journalCell.photoImageView.image = journalEntry.photo
+        if let photoData = journalEntry.photoData {
+            journalCell.photoImageView.image = UIImage(data: photoData) // decoder
+        }
+//        journalCell.dateLabel.text = journalEntry.date.formatted(.dateTime.month().day().year())
+        journalCell.dateLabel.text = journalEntry.dateString
         journalCell.titleLabel.text = journalEntry.entryTitle
         return journalCell
     }
@@ -41,7 +47,8 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     // MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            sampleJournalEntryData.journalEntries.remove(at: indexPath.row)
+//            sampleJournalEntryData.journalEntries.remove(at: indexPath.row)
+            SharedData.shared.removeJournalEntry(index: indexPath.row)
             tableView.reloadData()
         }
     }
@@ -54,7 +61,8 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     
     @IBAction func unwindNewEntrySave(segue: UIStoryboardSegue) {
         if let sourceViewController = segue.source as? AddJournalEntryViewController, let newJournalEntry = sourceViewController.newJournalEntry {
-            sampleJournalEntryData.journalEntries.append(newJournalEntry)
+//            sampleJournalEntryData.journalEntries.append(newJournalEntry)
+            SharedData.shared.addJournalEntry(newJournalEntry: newJournalEntry)
             // 스유와 다르게 유아이킷은 리로드를 해줘야 함
             tableView.reloadData()
         } else {
@@ -77,7 +85,8 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
               let indexPath = tableView.indexPath(for: selectedJournalEntryCell) else {
             fatalError("Could not get indexPath")
         }
-        let selectedJournalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
+//        let selectedJournalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
+        let selectedJournalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
         journalEntryDetailViewController.selectedJournalEntry = selectedJournalEntry
     }
 }

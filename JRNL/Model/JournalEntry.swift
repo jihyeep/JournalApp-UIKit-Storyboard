@@ -8,15 +8,17 @@
 import UIKit
 import MapKit
 
-class JournalEntry: NSObject, MKAnnotation {
+class JournalEntry: NSObject, MKAnnotation, Codable {
     // MKAnnotation 프로토콜을 추가함으로써 '국제 표준'으로 위치정보 및 데이터를 지도 상에 표시
     
     // MARK: - Properties
-    let date: Date
+//    let date: Date // 저장 못함
+    let dateString: String
     let rate: Int
     let entryTitle: String
     let entryBody: String
-    let photo: UIImage?
+//    let photo: UIImage? // 저장 못함
+    let photoData: Data?
     let latitude: Double?
     let longitude: Double?
     
@@ -27,11 +29,15 @@ class JournalEntry: NSObject, MKAnnotation {
         if title.isEmpty || body.isEmpty || rating < 0 || rating > 5 {
             return nil
         }
-        self.date = Date()
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+//        self.date = Date()
+        self.dateString = formatter.string(from: Date())
         self.rate = rating
         self.entryTitle = title
         self.entryBody = body
-        self.photo = photo
+//        self.photo = photo
+        self.photoData = photo?.jpegData(compressionQuality: 1.0)
         self.latitude = latitude
         self.longitude = longitude
     }
@@ -47,7 +53,8 @@ class JournalEntry: NSObject, MKAnnotation {
     
     // 콜아웃에 출력되게 함
     var title: String? {
-        date.formatted(.dateTime.year().month().day())
+//        date.formatted(.dateTime.year().month().day())
+        dateString
     }
     
     var subtitle: String? {
