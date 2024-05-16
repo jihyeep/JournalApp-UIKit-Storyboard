@@ -16,9 +16,9 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
         // 샘플 데이터 생성
 //        sampleJournalEntryData.createSampleJournalEntryData()
+        SharedData.shared.loadJournalEntriesData()
         
     }
     
@@ -49,6 +49,7 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
         if editingStyle == .delete {
 //            sampleJournalEntryData.journalEntries.remove(at: indexPath.row)
             SharedData.shared.removeJournalEntry(index: indexPath.row)
+            SharedData.shared.saveJournalEntriesData()
             tableView.reloadData()
         }
     }
@@ -63,6 +64,7 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
         if let sourceViewController = segue.source as? AddJournalEntryViewController, let newJournalEntry = sourceViewController.newJournalEntry {
 //            sampleJournalEntryData.journalEntries.append(newJournalEntry)
             SharedData.shared.addJournalEntry(newJournalEntry: newJournalEntry)
+            SharedData.shared.saveJournalEntriesData()
             // 스유와 다르게 유아이킷은 리로드를 해줘야 함
             tableView.reloadData()
         } else {
