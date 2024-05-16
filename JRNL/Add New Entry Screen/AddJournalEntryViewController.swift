@@ -97,6 +97,22 @@ class AddJournalEntryViewController: UIViewController, UITextFieldDelegate, UITe
         print("Failed to find user's location: \(error.localizedDescription)")
     }
     
+    // MARK: - UIImagePickerControllerDelegate
+    // 성공
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
+            fatalError("Expected a dictionary containing an image, but was proviede the following: \(info)")
+        }
+        // 이미지 작게 만들기
+        let smallerImage = selectedImage.preparingThumbnail(of: CGSize(width: 300, height: 300))
+        photoImageView.image = smallerImage
+        dismiss(animated: true)
+    }
+    // 실패
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true)
+    }
+    
     // MARK: - Methods
     private func updateSaveButtonState() {
         let textFieldText = titleTextField.text ?? ""
@@ -120,7 +136,7 @@ class AddJournalEntryViewController: UIViewController, UITextFieldDelegate, UITe
         }
     }
     
-    // 피커뷰를 열어줌
+    // 이미지피커뷰를 열어줌
     @IBAction func getPhoto(_ sender: UITapGestureRecognizer) {
         let imagePickerController = UIImagePickerController()
         imagePickerController.delegate = self
