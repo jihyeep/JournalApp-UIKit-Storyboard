@@ -9,20 +9,26 @@ import UIKit
 
 class RatingView: UIStackView {
     private var ratingButtons = [UIButton()]
-    var rating = 0
+    var rating = 0 {
+        didSet {
+            updateButtonSelectionState()
+        }
+    }
+    
     private let buttonSize = CGSize(width: 44.0, height: 44.0)
     private let buttonCount = 5
     
     // MARK: - Initialization
     required init(coder: NSCoder) {
         super.init(coder: coder)
+        setupButtons()
     }
     
     // MARK: - Private Methods
     private func setupButtons() {
         for button in ratingButtons {
             removeArrangedSubview(button)
-            button.removeFromSuperview()
+            button.removeFromSuperview() // 메모리 해제 시점이 맞지 않아 제거되지 않을 수 있으므로 명확하게 제거하기 위해 작성
         }
         ratingButtons.removeAll()
         
@@ -38,13 +44,35 @@ class RatingView: UIStackView {
             button.setImage(filledStar, for: .selected)
             // 누르는 중
             button.setImage(highlightedStar, for: .highlighted)
+            // 눌려진 상태에서 누르는 중
             button.setImage(highlightedStar, for: [.highlighted, .selected])
             
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive = true // 이전에는 배열에 넣어줌
-            button.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive = true
+//            button.translatesAutoresizingMaskIntoConstraints = false
+//            button.widthAnchor.constraint(equalToConstant: buttonSize.width).isActive = true // 이전에는 배열에 넣어줌
+//            button.heightAnchor.constraint(equalToConstant: buttonSize.height).isActive = true // 활성화해줌
+            // 나의 이벤트에 메서드를 등록함
+            button.addTarget(self, action: #selector(ratingButtonTapped(button: )), for: .touchUpInside)
+            
             addArrangedSubview(button)
             ratingButtons.append(button)
+        }
+    }
+    
+    private func updateButtonSelectionState() {
+        for (index, button) in ratingButtons.enumerated() {
+            button.isSelected = index < rating
+        }
+    }
+    @objc func ratingButtonTapped(button: UIButton) {
+        guard let index = ratingButtons.firstIndex(of: button) else {
+            fatalError("The button, \(button), is not in the ratingButtons array: \(ratingButtons)")
+        }
+        let selectedRating = index + 1
+        // 변경사항이 있을 때만 저장
+        if selectedRating == rating {
+            rating = 0
+        } else {
+            rating = selectedRating
         }
     }
 }

@@ -18,6 +18,8 @@ class AddJournalEntryViewController: UIViewController, UITextFieldDelegate, UITe
     @IBOutlet var getLocationSwitch: UISwitch!
     @IBOutlet var getLocationSwitchLabel: UILabel!
     
+    @IBOutlet var ratingView: RatingView!
+    
     var newJournalEntry: JournalEntry?
     
     let locationManager = CLLocationManager()
@@ -43,7 +45,7 @@ class AddJournalEntryViewController: UIViewController, UITextFieldDelegate, UITe
         let title = titleTextField.text ?? ""
         let body = bodyTextView.text ?? ""
         let photo = photoImageView.image
-        let rating = 3
+        let rating = ratingView.rating
         let lat = currentLocation?.coordinate.latitude
         let long = currentLocation?.coordinate.longitude
         

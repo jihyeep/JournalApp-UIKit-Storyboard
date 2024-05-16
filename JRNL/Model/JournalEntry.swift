@@ -14,7 +14,7 @@ class JournalEntry: NSObject, MKAnnotation, Codable {
     // MARK: - Properties
 //    let date: Date // 저장 못함
     let dateString: String
-    let rate: Int
+    let rating: Int
     let entryTitle: String
     let entryBody: String
 //    let photo: UIImage? // 저장 못함
@@ -33,7 +33,7 @@ class JournalEntry: NSObject, MKAnnotation, Codable {
         formatter.dateStyle = .medium
 //        self.date = Date()
         self.dateString = formatter.string(from: Date())
-        self.rate = rating
+        self.rating = rating
         self.entryTitle = title
         self.entryBody = body
 //        self.photo = photo
