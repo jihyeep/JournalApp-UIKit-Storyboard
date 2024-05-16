@@ -10,6 +10,7 @@ import UIKit
 class RatingView: UIStackView {
     private var ratingButtons = [UIButton()]
     var rating = 0 {
+        // 프로퍼티 옵저버: 상태 업데이트될 때마다 실행
         didSet {
             updateButtonSelectionState()
         }
@@ -26,16 +27,19 @@ class RatingView: UIStackView {
     
     // MARK: - Private Methods
     private func setupButtons() {
+        // 기존 버튼 제거
         for button in ratingButtons {
             removeArrangedSubview(button)
             button.removeFromSuperview() // 메모리 해제 시점이 맞지 않아 제거되지 않을 수 있으므로 명확하게 제거하기 위해 작성
         }
         ratingButtons.removeAll()
         
+        // 별 이미지 설정
         let filledStar = UIImage(systemName: "star.fill")
         let emptyStar = UIImage(systemName: "star")
         let highlightedStar = UIImage(systemName: "star.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal)
         
+        // 버튼 생성 및 설정
         for _ in 0..<buttonCount {
             let button = UIButton()
             // 누르기 전
@@ -58,11 +62,14 @@ class RatingView: UIStackView {
         }
     }
     
+    // 별점에 따른 버튼 상태 업데이트
     private func updateButtonSelectionState() {
         for (index, button) in ratingButtons.enumerated() {
             button.isSelected = index < rating
         }
     }
+    
+    // 별점 변경 액션
     @objc func ratingButtonTapped(button: UIButton) {
         guard let index = ratingButtons.firstIndex(of: button) else {
             fatalError("The button, \(button), is not in the ratingButtons array: \(ratingButtons)")
