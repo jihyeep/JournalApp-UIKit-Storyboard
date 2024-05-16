@@ -76,7 +76,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     }
     
     // MARK: - navigation
-    //
     // 세그웨이가 실행되기 전에 항상 호출됨(세그웨이 호출 시 데이터 전달) -> 맵뷰의 콜아웃에서 데이터 그려짐
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
