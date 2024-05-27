@@ -7,11 +7,11 @@
 
 import UIKit
 
-class JournalListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
+class JournalListViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UISearchResultsUpdating {
     
     // MARK: - Properties
     // IB와 연결된 오브젝트(객체)
-    @IBOutlet var tableView: UITableView!
+    @IBOutlet var collectionView: UICollectionView!
 //    var sampleJournalEntryData = SampleJournalEntryData()
     
     let search = UISearchController(searchResultsController: nil)
@@ -32,8 +32,8 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     // MARK: - UITableViewDataSource
-    // 특정 섹션에 대한 테이블 뷰의 행 수
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    // 특정 섹션에 대한 컬렉션 뷰의 행 수
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if search.isActive {
             return self.filteredTableData.count
         } else {
@@ -41,9 +41,9 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
         }
     }
     
-    // 특정 위치에 대한 테이블 뷰 셀 구성 및 반환
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let journalCell = tableView.dequeueReusableCell(withIdentifier: "journalCell", for: indexPath) as! JournalListCollectionViewCell
+    // 특정 위치에 대한 컬렉션 뷰 셀 구성 및 반환
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let journalCell = collectionView.dequeueReusableCell(withReuseIdentifier: "journalCell", for: indexPath) as! JournalListCollectionViewCell
         
         let journalEntry: JournalEntry
         if self.search.isActive {
@@ -52,31 +52,32 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
             journalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
         }
         
-//        journalCell.photoImageView.image = journalEntry.photo
         if let photoData = journalEntry.photoData {
             journalCell.photoImageView.image = UIImage(data: photoData) // decoder
         }
-//        journalCell.dateLabel.text = journalEntry.date.formatted(.dateTime.month().day().year())
+        
         journalCell.dateLabel.text = journalEntry.dateString
         journalCell.titleLabel.text = journalEntry.entryTitle
         return journalCell
     }
     
-    // MARK: - UITableViewDelegate
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            if self.search.isActive {
-                let selectedJournalEntry = filteredTableData[indexPath.row]
-                // 필터링된 데이터에서 특정 데이터 삭제
-                filteredTableData.remove(at: indexPath.row)
-                SharedData.shared.removeSelectedJournalEntry(selectedJournalEntry)
-            } else {
-                SharedData.shared.removeJournalEntry(index: indexPath.row)
+    // MARK: - UICollectionViewDelegate
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        let config = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { (elements) -> UIMenu? in // nil이 아니면 재사용 가능
+            let delete = UIAction(title: "Delete") { [weak self] (action) in
+                if let search = self?.search.isActive,
+                   let selectedJournalEntry = self?.filteredTableData[indexPath.item] {
+                    self?.filteredTableData.remove(at: indexPath.item)
+                    SharedData.shared.removeSelectedJournalEntry(selectedJournalEntry)
+                } else {
+                    SharedData.shared.removeJournalEntry(index: indexPath.item)
+                }
+                SharedData.shared.saveJournalEntriesData()
+                collectionView.reloadData()
             }
-            
-            SharedData.shared.saveJournalEntriesData()
-            tableView.reloadData()
+            return UIMenu(title: "", image: nil, identifier: nil, options: [], children: [delete])
         }
+        return config
     }
     
     // MARK: - UISearchResultsUpdating
@@ -95,7 +96,7 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
         filteredTableData = SharedData.shared.getAllJournalEntries().filter { journalEntry in
             journalEntry.entryTitle.lowercased().contains(searchBarText.lowercased())
         }
-        self.tableView.reloadData()
+        self.collectionView.reloadData()
     }
     
     // MARK: - Methods
@@ -110,7 +111,7 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
             SharedData.shared.addJournalEntry(newJournalEntry: newJournalEntry)
             SharedData.shared.saveJournalEntriesData()
             // 스유와 다르게 유아이킷은 리로드를 해줘야 함
-            tableView.reloadData()
+            collectionView.reloadData()
         } else {
             print("No Entry or Controller")
         }
@@ -128,7 +129,7 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
         }
         guard let journalEntryDetailViewController = segue.destination as? JournalEntryDetailViewController,
               let selectedJournalEntryCell = sender as? JournalListCollectionViewCell,
-              let indexPath = tableView.indexPath(for: selectedJournalEntryCell) else {
+              let indexPath = collectionView.indexPath(for: selectedJournalEntryCell) else {
             fatalError("Could not get indexPath")
         }
         
