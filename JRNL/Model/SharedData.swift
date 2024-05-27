@@ -32,6 +32,13 @@ class SharedData {
         journalEntries.append(newJournalEntry)
     }
     
+    // 데이터 삭제 시 인스턴스의 id에 해당하는 데이터를 지움
+    func removeSelectedJournalEntry(_ selectedJournalEntry: JournalEntry) {
+        journalEntries.removeAll {
+            $0.key == selectedJournalEntry.key
+        }
+    }
+    
     func removeJournalEntry(index: Int) {
         journalEntries.remove(at: index)
     }

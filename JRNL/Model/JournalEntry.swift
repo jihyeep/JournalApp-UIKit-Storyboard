@@ -12,6 +12,7 @@ class JournalEntry: NSObject, MKAnnotation, Codable {
     // MKAnnotation 프로토콜을 추가함으로써 '국제 표준'으로 위치정보 및 데이터를 지도 상에 표시
     
     // MARK: - Properties
+    var key = UUID().uuidString
 //    let date: Date // 저장 못함
     let dateString: String
     let rating: Int
