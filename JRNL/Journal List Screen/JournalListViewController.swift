@@ -34,15 +34,24 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     // MARK: - UITableViewDataSource
     // 특정 섹션에 대한 테이블 뷰의 행 수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        sampleJournalEntryData.journalEntries.count
-        SharedData.shared.numberOfJournalEntries()
+        if search.isActive {
+            return self.filteredTableData.count
+        } else {
+            return SharedData.shared.numberOfJournalEntries()
+        }
     }
     
     // 특정 위치에 대한 테이블 뷰 셀 구성 및 반환
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let journalCell = tableView.dequeueReusableCell(withIdentifier: "journalCell", for: indexPath) as! JournalListTableViewCell
-//        let journalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
-        let journalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
+        
+        let journalEntry: JournalEntry
+        if self.search.isActive {
+            journalEntry = filteredTableData[indexPath.row]
+        } else {
+            journalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
+        }
+        
 //        journalCell.photoImageView.image = journalEntry.photo
         if let photoData = journalEntry.photoData {
             journalCell.photoImageView.image = UIImage(data: photoData) // decoder
@@ -68,7 +77,18 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
         guard let searchBarText = searchController.searchBar.text else {
             return
         }
-        print(searchBarText)
+        filteredTableData.removeAll()
+        // 명령형 - 문제 발생 시 break 가능
+//        for journalEntry in SharedData.shared.getAllJournalEntries() {
+//            if journalEntry.entryTitle.lowercased().contains(searchBarText.lowercased()) {
+//                filteredTableData.append(journalEntry)
+//            }
+//        }
+        // 선언형(고차함수 사용) - 문제 발생 시 break 불가능
+        filteredTableData = SharedData.shared.getAllJournalEntries().filter { journalEntry in
+            journalEntry.entryTitle.lowercased().contains(searchBarText.lowercased())
+        }
+        self.tableView.reloadData()
     }
     
     // MARK: - Methods
@@ -104,8 +124,13 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
               let indexPath = tableView.indexPath(for: selectedJournalEntryCell) else {
             fatalError("Could not get indexPath")
         }
-//        let selectedJournalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
-        let selectedJournalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
+        
+        let selectedJournalEntry: JournalEntry
+        if self.search.isActive {
+            selectedJournalEntry = filteredTableData[indexPath.row]
+        } else {
+            selectedJournalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
+        }
         journalEntryDetailViewController.selectedJournalEntry = selectedJournalEntry
     }
 }
