@@ -23,6 +23,9 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
 //        sampleJournalEntryData.createSampleJournalEntryData()
         SharedData.shared.loadJournalEntriesData()
         
+        // 여백 설정
+        setupCollectionView()
+        
         search.searchResultsUpdater = self
         // 사용자가 검색 인터페이스를 활성화했을 때 배경이 흐려지는지 여부를 결정
         search.obscuresBackgroundDuringPresentation = false
@@ -31,7 +34,15 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
     
     }
     
-    // MARK: - UITableViewDataSource
+    // 화면 회전할 때마다 레이아웃 업데이트
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        collectionView.collectionViewLayout.invalidateLayout()
+    }
+    
+
+    
+    // MARK: - UICollectionViewDataSource
     // 특정 섹션에 대한 컬렉션 뷰의 행 수
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if search.isActive {
@@ -80,6 +91,24 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
         return config
     }
     
+    // MARK: - UICollectionViewDelegateFlowLayout
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        // 동적으로 크기 지정
+        var columns: CGFloat
+        if (traitCollection.horizontalSizeClass == .compact) { // 컴팩트한 화면
+            columns = 1
+        } else { // 넓은 화면
+            columns = 2
+        }
+        
+        let viewWidth = collectionView.frame.width
+        let inset = 10.0 // 여백
+        let contentWidth = viewWidth - inset * (columns + 1) // viewWidth - 여백 갯수
+        let cellWidth = contentWidth / columns
+        let cellHeight = 90.0
+        return CGSize(width: cellWidth, height: cellHeight)
+    }
+    
     // MARK: - UISearchResultsUpdating
     func updateSearchResults(for searchController: UISearchController) {
         guard let searchBarText = searchController.searchBar.text else {
@@ -115,6 +144,15 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
         } else {
             print("No Entry or Controller")
         }
+    }
+    
+    // 여백 설정
+    func setupCollectionView() {
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        flowLayout.minimumLineSpacing = 0 // 아이템 간 간격
+        flowLayout.minimumLineSpacing = 10 // 라인 넘어가면 10
+        collectionView.collectionViewLayout = flowLayout
     }
     
     // MARK: - Navigation
