@@ -7,12 +7,15 @@
 
 import UIKit
 
-class JournalListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class JournalListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
     
     // MARK: - Properties
     // IB와 연결된 오브젝트(객체)
     @IBOutlet var tableView: UITableView!
 //    var sampleJournalEntryData = SampleJournalEntryData()
+    
+    let search = UISearchController(searchResultsController: nil)
+    var filteredTableData: [JournalEntry] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +23,12 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
 //        sampleJournalEntryData.createSampleJournalEntryData()
         SharedData.shared.loadJournalEntriesData()
         
+        search.searchResultsUpdater = self
+        // 사용자가 검색 인터페이스를 활성화했을 때 배경이 흐려지는지 여부를 결정
+        search.obscuresBackgroundDuringPresentation = false
+        search.searchBar.placeholder = "Search titles"
+        navigationItem.searchController = search
+    
     }
     
     // MARK: - UITableViewDataSource
@@ -52,6 +61,14 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
             SharedData.shared.saveJournalEntriesData()
             tableView.reloadData()
         }
+    }
+    
+    // MARK: - UISearchResultsUpdating
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchBarText = searchController.searchBar.text else {
+            return
+        }
+        print(searchBarText)
     }
     
     // MARK: - Methods
