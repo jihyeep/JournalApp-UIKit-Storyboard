@@ -12,10 +12,10 @@ import SwiftData
 @Model
 //class JournalEntry: NSObject, MKAnnotation {
     // MKAnnotation 프로토콜을 추가함으로써 '국제 표준'으로 위치정보 및 데이터를 지도 상에 표시
-class JournalEntry { // Model 매크로와 NSObject 프로토콜을 함께 쓸 수 없음
+class JournalEntry { // Model 매크로는 NSObject 프로토콜을 수용할 수 없음
     
     // MARK: - Properties
-    var key = UUID().uuidString
+//    var key = UUID().uuidString
 //    let date: Date // 저장 못함
     let dateString: String
     let rating: Int

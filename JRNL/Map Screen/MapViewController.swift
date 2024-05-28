@@ -8,6 +8,7 @@
 import UIKit
 import CoreLocation
 import MapKit
+import SwiftData
 
 class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     
@@ -15,6 +16,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     let locationManager = CLLocationManager() // 위치 정보 가져옴
 //    var sampleJournalEntryData = SampleJournalEntryData() // 샘플 데이터
     var selectedJournalEntry: JournalEntry?
+    
+    var container: ModelContainer?
+    var context: ModelContext?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +33,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         mapView.delegate = self // 델리게이트 지정
 //        sampleJournalEntryData.createSampleJournalEntryData()
 //        mapView.addAnnotations(sampleJournalEntryData.journalEntries) // 핀이 박힘
+        
+        guard let _container = try? ModelContainer(for: JournalEntry.self) else {
+            fatalError("Could not initialize Container")
+        }
+        container = _container
+        context = ModelContext(_container)
         
     }
     
@@ -46,6 +56,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             self.navigationItem.title = "Map"
             mapView.region = setInitialRegion(lat: lat, long: long)
 //            mapView.addAnnotations(SharedData.shared.getAllJournalEntries())
+            
+            let descrptor = FetchDescriptor<JournalEntry>(predicate: #Predicate { $0.latitude != nil && $0.longitude != nil })
+            guard let journalEntries = try? context?.fetch(descrptor) else {
+                return
+            }
+            let annotations = journalEntries.map { JournalMapAnnotation(journal: $0) }
+            mapView.addAnnotations(annotations)
         }
     }
     // 실패
@@ -57,7 +74,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     // 핀을 누르면 맵뷰를 생성함
     func mapView(_ mapView: MKMapView, viewFor annotation: any MKAnnotation) -> MKAnnotationView? {
         let identifier = "mapAnnotation"
-        if annotation is JournalEntry { // is: 타입 체크(값 체크일 경우 ==)
+//        if annotation is JournalEntry { // is: 타입 체크(값 체크일 경우 ==)
+        if annotation is JournalMapAnnotation {
             if let annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) {
                 annotationView.annotation = annotation
                 return annotationView
@@ -78,7 +96,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         guard let annotation = mapView.selectedAnnotations.first else {
             return
         }
-        selectedJournalEntry = annotation as? JournalEntry
+//        selectedJournalEntry = annotation as? JournalEntry
+        selectedJournalEntry = (annotation as? JournalMapAnnotation)?.journal
+        
         // 세그웨이 호출
         self.performSegue(withIdentifier: "showMapDetail", sender: self)
     }
