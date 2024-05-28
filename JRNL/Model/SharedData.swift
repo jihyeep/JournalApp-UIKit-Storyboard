@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftData
 
 class SharedData {
     static let shared = SharedData() // 싱글톤의 시작

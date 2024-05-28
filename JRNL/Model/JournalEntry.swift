@@ -7,8 +7,10 @@
 
 import UIKit
 import MapKit
+import SwiftData
 
-class JournalEntry: NSObject, MKAnnotation, Codable {
+@Model
+class JournalEntry: NSObject, MKAnnotation {
     // MKAnnotation 프로토콜을 추가함으로써 '국제 표준'으로 위치정보 및 데이터를 지도 상에 표시
     
     // MARK: - Properties
