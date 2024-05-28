@@ -10,8 +10,9 @@ import MapKit
 import SwiftData
 
 @Model
-class JournalEntry: NSObject, MKAnnotation {
+//class JournalEntry: NSObject, MKAnnotation {
     // MKAnnotation 프로토콜을 추가함으로써 '국제 표준'으로 위치정보 및 데이터를 지도 상에 표시
+class JournalEntry { // Model 매크로와 NSObject 프로토콜을 함께 쓸 수 없음
     
     // MARK: - Properties
     var key = UUID().uuidString
@@ -21,11 +22,12 @@ class JournalEntry: NSObject, MKAnnotation {
     let entryTitle: String
     let entryBody: String
 //    let photo: UIImage? // 저장 못함
-    let photoData: Data?
+//    let photoData: Data?
+    @Attribute(.externalStorage) let photoData: Data? // SwiftData에 저장
     let latitude: Double?
     let longitude: Double?
     
-    // MARK: Initialization
+    // MARK: - Initialization
     // nil일 수도 있기 때문에 옵셔널 지정
     init?(rating: Int, title: String, body: String, photo: UIImage? = nil, latitude: Double? = nil, longitude: Double? = nil) {
         // 데이터 정합성(validation) 체크 - 해당하면 생성이 안됨
@@ -45,6 +47,7 @@ class JournalEntry: NSObject, MKAnnotation {
         self.longitude = longitude
     }
     
+    /*
     // MKAnnotation 필수 프로퍼티
     var coordinate: CLLocationCoordinate2D {
         guard let lat = latitude,
@@ -63,6 +66,7 @@ class JournalEntry: NSObject, MKAnnotation {
     var subtitle: String? {
         entryTitle
     }
+    */
 }
 
 // MARK: - Sample data
@@ -86,4 +90,5 @@ struct SampleJournalEntryData {
         
         journalEntries += [journalEntry1, journalEntry2, journalEntry3]
     }
+    
 }

@@ -49,7 +49,7 @@ class SharedData {
         // FileManager.default - 싱글톤 패턴
         return paths[0]
     }
-    
+    /*
     func loadJournalEntriesData() {
         let pathDirectory = getDocumentDirectory() // 유저 경로
         let fileURL = pathDirectory.appendingPathComponent("journalEntriesData.json")
@@ -74,4 +74,5 @@ class SharedData {
             print("Failed to write JSON data: \(error.localizedDescription)")
         }
     }
+    */
 }

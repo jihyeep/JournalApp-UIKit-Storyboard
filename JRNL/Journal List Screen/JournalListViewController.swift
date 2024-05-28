@@ -161,7 +161,7 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
 //            SharedData.shared.addJournalEntry(newJournalEntry: newJournalEntry)
 //            SharedData.shared.saveJournalEntriesData()
             self.context?.insert(newJournalEntry)
-            self.search.searchBar.isHidden = false
+            fetchJournalEntries()
             // 스유와 다르게 유아이킷은 리로드를 해줘야 함
             collectionView.reloadData()
         } else {
@@ -181,8 +181,7 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
     // 스위프트 데이터에서 조회
     func fetchJournalEntries() {
         // thread safe
-        if let context = self.context,
-           let journalEntries = try? context.fetch(descriptor) {
+        if let journalEntries = try? context?.fetch(descriptor) {
             self.journalEntries = journalEntries
         }
     }
