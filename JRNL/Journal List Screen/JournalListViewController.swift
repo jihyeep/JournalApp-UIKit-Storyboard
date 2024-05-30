@@ -100,7 +100,7 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
                 } else {
 //                    SharedData.shared.removeJournalEntry(index: indexPath.item)
                     if let selectedJournalEntry = self?.journalEntries[indexPath.item] {
-                        self?.journalEntries.remove(at: indexPath.row)
+                        self?.journalEntries.remove(at: indexPath.item)
                         self?.context?.delete(selectedJournalEntry)
                     }
                 }
@@ -161,7 +161,7 @@ class JournalListViewController: UIViewController, UICollectionViewDataSource, U
 //            SharedData.shared.addJournalEntry(newJournalEntry: newJournalEntry)
 //            SharedData.shared.saveJournalEntriesData()
             self.context?.insert(newJournalEntry)
-            fetchJournalEntries()
+            fetchJournalEntries() // 데이터 배치를 다시 함
             // 스유와 다르게 유아이킷은 리로드를 해줘야 함
             collectionView.reloadData()
         } else {

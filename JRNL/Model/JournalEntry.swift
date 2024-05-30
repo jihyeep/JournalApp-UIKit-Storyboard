@@ -23,7 +23,7 @@ class JournalEntry { // Model 매크로는 NSObject 프로토콜을 수용할 �
     let entryBody: String
 //    let photo: UIImage? // 저장 못함
 //    let photoData: Data?
-    @Attribute(.externalStorage) let photoData: Data? // SwiftData에 저장
+    @Attribute(.externalStorage) let photoData: Data? // 저장소를 분리하여 저장(크기가 커서)
     let latitude: Double?
     let longitude: Double?
     
