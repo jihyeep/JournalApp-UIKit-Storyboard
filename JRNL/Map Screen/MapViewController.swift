@@ -9,6 +9,7 @@ import UIKit
 import CoreLocation
 import MapKit
 import SwiftData
+import SwiftUI
 
 class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate {
     
@@ -21,6 +22,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     var context: ModelContext?
     
     var annotations: [JournalMapAnnotation] = []
+    
+    let globeView = UIHostingController(rootView: GlobeView())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,7 +51,25 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         super.viewIsAppearing(animated)
         mapView.removeAnnotations(annotations)
         locationManager.requestLocation()
+        
+        // MARK: - visionOS
+        #if os(xrOS)
+        addChild(globeView)
+        view.addSubview(globeView.view)
+        setupConstraints()
+        #endif
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+       super.viewDidDisappear(animated)
+       #if os(xrOS)
+       self.children.forEach {
+         $0.willMove(toParent: nil)
+         $0.view.removeFromSuperview()
+         $0.removeFromParent()
+       }
+       #endif
+     }
     
     // MARK: - CLLocationManagerDelegate
     // 성공
@@ -124,6 +145,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     func setInitialRegion(lat: CLLocationDegrees, long: CLLocationDegrees) -> MKCoordinateRegion {
         MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: lat, longitude: long),
                            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)) // 지도의 단위
+    }
+    
+    // for visionOS
+    private func setupConstraints() {
+        globeView.view.translatesAutoresizingMaskIntoConstraints = false
+        globeView.view.centerXAnchor.constraint(equalTo:
+                                                    view.centerXAnchor).isActive = true
+        globeView.view.centerYAnchor.constraint(equalTo:
+                                                    view.centerYAnchor).isActive = true
+        globeView.view.heightAnchor.constraint(equalToConstant: 600.0).isActive =
+        true
+        globeView.view.widthAnchor.constraint(equalToConstant: 600.0).isActive =
+        true
     }
 
 }
